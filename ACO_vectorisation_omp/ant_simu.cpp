@@ -3,6 +3,7 @@
 # include <random>
 # include <chrono>
 # include <fstream>
+# include <omp.h>
 # include "fractal_land.hpp"
 # include "pheronome.hpp"
 # include "renderer.hpp"
@@ -68,10 +69,16 @@ int main(int nargs, char* argv[])
     SDL_Init( SDL_INIT_VIDEO );
 
     //Les fichiers pour analyse des données de temps
-    std::ofstream csv_iterations("iteration.csv");
+    std::ofstream csv_iterations("iteration_"+std::to_string(omp_get_max_threads())+".csv");
     csv_iterations << "Iteration,Temps_Fourmis_ms,Temps_Evaporation_ms,Temps_Update_ms\n";
-    std::ofstream csv_resume("resume.csv"); //std::ios::app);
-    csv_resume << "Threads,Temps_Creation_Fourmis,Iteration_Nourriture,Temps_Computation,Temps_Total\n";
+    std::ofstream csv_resume;
+    if(omp_get_max_threads()==1){
+        csv_resume.open("resume.csv");
+        csv_resume << "Threads,Temps_Creation_Fourmis,Iteration_Nourriture,Temps_Computation,Temps_Total\n";
+    }
+    else{
+        csv_resume.open("resume.csv", std::ios::app);
+    }
 
     std::size_t seed = 2026; // Graine pour la génération aléatoire ( reproductible )
     const int nb_ants = 5000; // Nombre de fourmis
@@ -154,7 +161,7 @@ int main(int nargs, char* argv[])
             std::cout << "Temps pur de calcul (sans affichage): " << pure_computation_time.count() << "ms\n";
             std::cout << "Temps total (avec affichage et init):" << duration_until_first_food.count() << "ms\n";
 
-            int num_threads = 1;
+            int num_threads = omp_get_max_threads();
             csv_resume << num_threads << "," 
                        << ant_creation_duration.count() << ","
                        << it << "," 

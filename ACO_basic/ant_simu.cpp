@@ -131,12 +131,15 @@ int main(int nargs, char* argv[])
     
     //Temps pur de simulation (sans affichage et initialisation)
     std::chrono::duration<double,std::milli> pure_computation_time(0);
-
+    size_t stop_after_finding_food = 0;
     while (cont_loop) {
         ++it;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 cont_loop = false;
+        }
+        if(stop_after_finding_food>0 && it>stop_after_finding_food){
+            cont_loop = false;
         }
 
         //La simulation pure (l'avance des fourmis et actualisation des pheromones)
@@ -164,6 +167,7 @@ int main(int nargs, char* argv[])
                        << pure_computation_time.count() << ","
                        << duration_until_first_food.count() << "\n";
 
+            stop_after_finding_food = it+300;
             not_food_in_nest = false;
         }
         //SDL_Delay(10);

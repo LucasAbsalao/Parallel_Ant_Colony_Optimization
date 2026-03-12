@@ -98,6 +98,7 @@ void Colonie::advance(int idx, pheronome& phen, const fractal_land& land,
 void Colonie::advance_all(pheronome& phen, const fractal_land& land,
             const position_t& pos_food, const position_t& pos_nest, 
             std::size_t& cpteur_food ){
+    #pragma omp parallel for
     for(int idx=0; idx<qtt_ants;idx++){
         auto ant_choice = [this, idx]() mutable { return rand_double( 0., 1., this->m_seed[idx] ); };
         auto dir_choice = [this, idx]() mutable { return rand_int32( 1, 4, this->m_seed[idx] ); };
@@ -139,6 +140,7 @@ void Colonie::advance_all(pheronome& phen, const fractal_land& land,
             pos_ants[idx] = new_pos_ant;
             if ( get_position(idx) == pos_nest ) {
                 if ( is_loaded(idx) ) {
+                    #pragma omp atomic
                     cpteur_food += 1;
                 }
                 unset_loaded(idx);
