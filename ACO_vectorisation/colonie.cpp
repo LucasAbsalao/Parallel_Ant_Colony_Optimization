@@ -1,20 +1,41 @@
 #include"colonie.hpp"
-#include "rand_generator.hpp"
+
+Colonie::Colonie(const size_t qtt_ants, double eps): m_eps(eps), qtt_ants(qtt_ants)
+{}
+
+void Colonie::create_ants(unsigned long int dimension, std::size_t seed){
+    auto gen_ant_pos = [&dimension, &seed] () { return rand_int32(0, dimension-1, seed); };
+
+    //Allouer la taille de chaque vecteur
+    pos_ants.reserve(qtt_ants);
+    state_ants.reserve(qtt_ants);
+    m_seed.reserve(qtt_ants);
+
+    for(int i=0; i<qtt_ants; i++){
+        pos_ants.push_back(position_t{gen_ant_pos(), gen_ant_pos()});
+        state_ants.push_back(unloaded);
+        m_seed.push_back(seed);
+    }
+}
 
 void Colonie::set_loaded(int idx){
-    state_ants.at(idx) = loaded;
+    state_ants[idx] = loaded;
 }
 
 void Colonie::unset_loaded(int idx){
-    state_ants.at(idx) = unloaded;
+    state_ants[idx] = unloaded;
 }
 
 bool Colonie::is_loaded(int idx) const{
-    return state_ants.at(idx) == loaded;
+    return state_ants[idx] == loaded;
 }
 
 const position_t& Colonie::get_position(int idx) const{
-    return pos_ants.at(idx);
+    return pos_ants[idx];
+}
+
+const int Colonie::get_qtt_ants() const{
+    return this->qtt_ants;
 }
 
 void Colonie::set_exploration_coef(double eps){
