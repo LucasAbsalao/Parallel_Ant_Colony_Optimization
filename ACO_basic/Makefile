@@ -1,6 +1,6 @@
 include Make_linux.inc
 #include Make_msys2.inc
-#include Make_osx.inc
+include Make_osx.inc
 
 CXXFLAGS = -std=c++17
 ifdef DEBUG
@@ -21,7 +21,7 @@ clean:
 	@rm -fr *.o *.exe *~
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS2) -c $^ -o $@	
+	$(CXX) $(CXXFLAGS2) -I/opt/homebrew/include -c $^ -o $@
 
 ant_simu.exe : ant.o fractal_land.o renderer.o window.o ant_simu.o
 	$(CXX) $(CXXFLAGS2) $^ -o $@ $(LIB)	
