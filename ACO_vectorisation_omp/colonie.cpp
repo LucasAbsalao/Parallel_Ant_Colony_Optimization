@@ -11,7 +11,6 @@ void Colonie::create_ants(unsigned long int dimension, std::size_t seed){
     state_ants.reserve(qtt_ants);
     m_seed.reserve(qtt_ants);
 
-    #pragma omp parallel for
     for(int i=0; i<qtt_ants; i++){
         pos_ants[i] = position_t{gen_ant_pos(), gen_ant_pos()};
         state_ants[i] = unloaded;
