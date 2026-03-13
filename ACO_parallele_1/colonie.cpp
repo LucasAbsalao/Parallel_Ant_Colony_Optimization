@@ -3,6 +3,10 @@
 Colonie::Colonie(const size_t qtt_ants, double eps): m_eps(eps), qtt_ants(qtt_ants)
 {}
 
+Colonie::Colonie(const Colonie& other_col, int start, int end): m_eps(){
+
+}
+
 void Colonie::create_ants(unsigned long int dimension, std::size_t seed){
     auto gen_ant_pos = [&dimension, &seed] () { return rand_int32(0, dimension-1, seed); };
 
@@ -11,12 +15,34 @@ void Colonie::create_ants(unsigned long int dimension, std::size_t seed){
     state_ants.reserve(qtt_ants);
     m_seed.reserve(qtt_ants);
 
-    #pragma omp parallel for
     for(int i=0; i<qtt_ants; i++){
-        pos_ants[i] = position_t{gen_ant_pos(), gen_ant_pos()};
-        state_ants[i] = unloaded;
-        m_seed[i] = seed;
+        pos_ants.push_back(position_t{gen_ant_pos(), gen_ant_pos()});
+        state_ants.push_back(unloaded);
+        m_seed.push_back(seed);
     }
+}
+
+void Colonie::parallel_create_ants(unsigned long int dimension, std::size_t seed, int start, int end){
+    auto gen_ant_pos = [&dimension, &seed] () { return rand_int32(0, dimension-1, seed); };
+    int num_ants = end-start;
+
+    //Allouer la taille de chaque vecteur
+    pos_ants.resize(num_ants);
+    state_ants.resize(num_ants);
+    m_seed.resize(num_ants);
+
+    for(int i=0; i<end; i++){
+        position_t pos = {gen_ant_pos(), gen_ant_pos()};
+        size_t temp_seed = seed;
+
+        if(i>=start){
+            pos_ants[i-start] = pos;
+            state_ants[i-start] = unloaded;
+            m_seed[i-start] = temp_seed;
+        }
+    }
+
+    this->qtt_ants = num_ants;
 }
 
 void Colonie::set_loaded(int idx){
@@ -99,7 +125,6 @@ void Colonie::advance(int idx, pheronome& phen, const fractal_land& land,
 void Colonie::advance_all(pheronome& phen, const fractal_land& land,
             const position_t& pos_food, const position_t& pos_nest, 
             std::size_t& cpteur_food ){
-    #pragma omp parallel for
     for(int idx=0; idx<qtt_ants;idx++){
         auto ant_choice = [this, idx]() mutable { return rand_double( 0., 1., this->m_seed[idx] ); };
         auto dir_choice = [this, idx]() mutable { return rand_int32( 1, 4, this->m_seed[idx] ); };
@@ -141,7 +166,6 @@ void Colonie::advance_all(pheronome& phen, const fractal_land& land,
             pos_ants[idx] = new_pos_ant;
             if ( get_position(idx) == pos_nest ) {
                 if ( is_loaded(idx) ) {
-                    #pragma omp atomic
                     cpteur_food += 1;
                 }
                 unset_loaded(idx);

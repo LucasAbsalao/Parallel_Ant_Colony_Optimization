@@ -167,7 +167,7 @@ int main(int nargs, char* argv[])
                        << pure_computation_time.count() << ","
                        << duration_until_first_food.count() << "\n";
 
-            stop_after_finding_food = it+300;
+            stop_after_finding_food = it+600;
             not_food_in_nest = false;
         }
         //SDL_Delay(10);

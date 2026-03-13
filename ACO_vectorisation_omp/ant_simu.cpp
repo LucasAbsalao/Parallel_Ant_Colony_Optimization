@@ -68,16 +68,17 @@ int main(int nargs, char* argv[])
     auto start_time = std::chrono::high_resolution_clock::now(); // Le temp quand le programme a commencé a executer
     SDL_Init( SDL_INIT_VIDEO );
 
+    std::string path = "tests/";
     //Les fichiers pour analyse des données de temps
-    std::ofstream csv_iterations("iteration_"+std::to_string(omp_get_max_threads())+".csv");
+    std::ofstream csv_iterations(path+"iteration_"+std::to_string(omp_get_max_threads())+".csv");
     csv_iterations << "Iteration,Temps_Fourmis_ms,Temps_Evaporation_ms,Temps_Update_ms\n";
     std::ofstream csv_resume;
     if(omp_get_max_threads()==1){
-        csv_resume.open("resume.csv");
+    csv_resume.open(path+"resume.csv");
         csv_resume << "Threads,Temps_Creation_Fourmis,Iteration_Nourriture,Temps_Computation,Temps_Total\n";
     }
     else{
-        csv_resume.open("resume.csv", std::ios::app);
+        csv_resume.open(path+"resume.csv", std::ios::app);
     }
 
     std::size_t seed = 2026; // Graine pour la génération aléatoire ( reproductible )
@@ -168,7 +169,7 @@ int main(int nargs, char* argv[])
                        << pure_computation_time.count() << ","
                        << duration_until_first_food.count() << "\n";
 
-            stop_after_finding_food = it+300;
+            stop_after_finding_food = it+600;
             not_food_in_nest = false;
         }
         //SDL_Delay(10);
