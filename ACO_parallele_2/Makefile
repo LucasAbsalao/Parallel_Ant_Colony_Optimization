@@ -1,13 +1,15 @@
-include Make_linux.inc
-#include Make_msys2.inc
 include Make_osx.inc
+#include Make_linux.inc
+#include Make_msys2.inc
 
-CXXFLAGS = -std=c++17
+# ADICIONE O -fopenmp AQUI NESTA LINHA:
+CXXFLAGS = -std=c++17 -fopenmp -I/opt/homebrew/include
+
 ifdef DEBUG
 CXXFLAGS += -g -O0 -Wall -fbounds-check -pedantic -D_GLIBCXX_DEBUG
-CXXFLAGS2 = CXXFLAGS
+CXXFLAGS2 = $(CXXFLAGS)
 else
-CXXFLAGS2 = ${CXXFLAGS} -O2 -march=native -Wall 
+CXXFLAGS2 = $(CXXFLAGS) -O2 -march=native -Wall 
 CXXFLAGS += -O3 -march=native -Wall
 endif
 
@@ -16,6 +18,16 @@ ALL= ant_simu.exe
 default:	help
 
 all: $(ALL)
+
+benchmark: ant_simu.exe
+	@echo "Démarrage des tests de performance avec OpenMP..."
+	@for t in 1 2 4 8 12 16; do \
+		echo "========================================"; \
+		echo "Exécution avec $$t thread(s)..."; \
+		./ant_simu.exe $$t; \
+	done
+	@echo "========================================"
+	@echo "Tests terminés ! Veuillez vérifier vos fichiers CSV."
 
 clean:
 	@rm -fr *.o *.exe *~
