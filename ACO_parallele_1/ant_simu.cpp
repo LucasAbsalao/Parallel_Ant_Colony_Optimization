@@ -103,6 +103,7 @@ void advance_time( const fractal_land& land, pheronome& phen,
         ants_advance_total_duration = std::chrono::duration<double, std::milli>::zero();
         pheromone_communicator_total_duration = std::chrono::duration<double, std::milli>::zero();
         pheromone_evaporation_total_duration = std::chrono::duration<double, std::milli>::zero();
+        pheromone_evaporation_communicator_total_duration = std::chrono::duration<double, std::milli>::zero();
         pheromone_update_total_duration = std::chrono::duration<double, std::milli>::zero();
     }
 }
